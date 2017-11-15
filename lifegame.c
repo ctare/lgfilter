@@ -125,7 +125,7 @@ void next(struct game_map* game) {
           + cs[i][j]
           - cs[i + 3][j]
           - cs[i][j + 3];
-      if(lifes == 2) {
+      if(lifes < 3) {
         kill(game, j, i);
       } else if(lifes == 3) {
         spawn(game, j, i);
