@@ -35,24 +35,28 @@ class GameMap(Structure):
 
 lg = CDLL(base_dir + "/lg.so")
 
-def blur(data, n):
+def blur(data, n, size):
     game_map = GameMap()
-    lg.init_game_map(byref(game_map), 28, 28)
-    ndata = (data * 255).astype(numpy.int32).tolist()
-    for i in range(28):
-        for j, v in enumerate(ndata[i*28 : i*28 + 28]):
-            game_map.cells[i][j].r = v
+    lg.init_game_map(byref(game_map), size, size)
+    ndata = data.tolist()
+    for i in range(size):
+        for j in range(size):
+            game_map.cells[i][j].r = ndata[i][j][0]
+            game_map.cells[i][j].g = ndata[i][j][1]
+            game_map.cells[i][j].b = ndata[i][j][2]
 
-    for i in range(13):
+    for i in range(6):
         if n & 1:
-            lg.random_spawn(byref(game_map), 40)
+            lg.random_spawn(byref(game_map), 25)
         n >>= 1
         lg.next(byref(game_map))
 
-    after = [0 for x in range(28 * 28)]
-    for i in range(28):
-        for j in range(28):
-            after[i*28 + j] = game_map.cells[i][j].r
+    after = [[[0, 0, 0] for x in range(size)] for y in range(size)]
+    for i in range(size):
+        for j in range(size):
+            after[i][j][0] = game_map.cells[i][j].r
+            after[i][j][1] = game_map.cells[i][j].g
+            after[i][j][2] = game_map.cells[i][j].b
 
     after = numpy.array(after, dtype=numpy.float32)
     return after
